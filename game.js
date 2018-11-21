@@ -1,4 +1,4 @@
-var game = new Phaser.Game(500, 800, Phaser.AUTO, '', { preload: preload, create: create, update: update, backgroundColor: '#f3cca3' });
+var game = new Phaser.Game(700, 1000, Phaser.AUTO, '', { preload: preload, create: create, update: update, backgroundColor: '#f3cca3' });
 
 function preload() {
 
@@ -6,41 +6,62 @@ function preload() {
   game.load.image('bacon', '/assets/bacon.png');
   game.load.image('sandwich', '/assets/sandwich.png');
   game.load.image('pan', '/assets/pan.png');
-
+  this.game.load.physics("pan_hitbox", "assets/panhitbox.json");
 }
 
 var baconHead;
 var pan;
-var pressed100msAgo = false;
+var initialized;
+var sandwich;
 
 function create() {
-	game.stage.backgroundColor = "#FDD1C6";
+    game.stage.backgroundColor = "#FDD1C6";
 
-	game.physics.startSystem(Phaser.Physics.P2JS);
-    game.physics.p2.gravity.y = 1200;
+    game.physics.startSystem(Phaser.Physics.P2JS);
+    
+    game.physics.p2.defaultRestitution = 0.8;
+    game.physics.p2.gravity.y = 2000;
 
     createSandwich();
+    createPan();
 	createBacon(4, 50, 50);
-	createPan();
+    initialized = true;
+
+    baconHead.body.collides(sandwich, hitSandwich, this);
 }
 
-game.exampleMethod = function(data){
 
-
-};
-
+game.flipPan = function(){
+    pan.body.rotateLeft(160);
+  };
+  
+  
+function hitSandwich(){
+    console.log("hit")
+}
 
 function update() {
-	if (game.input.activePointer.isDown)
-    {
-    	if (!pressed100msAgo) {
-      		pressed100msAgo = true;
-      		console.log("test");
-        	lancer();
-        	hitPan();
-      		putPressed100msAgoFalse();
+  
+    if(initialized == true){
+    
+      if(game.input.activePointer.isDown){
+        game.flipPan();
+        lancer();
       }
-    	
+      else{
+        //pan.body.rotateLeft(0);
+        if(pan.body.angle < 30){
+          pan.body.rotateLeft(-160);
+          pan.goingBack = true;
+        }
+      }
+  
+      if(pan.goingBack && pan.body.angle >= 30) {
+        console.log("F");
+        pan.body.rotateLeft(0);
+        pan.goingBack = false;
+      }
+      console.log(pan.body.angle);
     }
 }
 
@@ -75,7 +96,10 @@ function createBacon(length, xAnchor, yAnchor){
         //  Set custom rectangle
         newRect.width = width;
         newRect.height = height;
+        
         newRect.body.setRectangle(width, height);
+
+        newRect.body.friction = 0.1;
         if (i === 0)
         {
             newRect.body.static = true;
@@ -91,7 +115,7 @@ function createBacon(length, xAnchor, yAnchor){
         //  After the first rectangle is created we can add the constraint
         if (lastRect)
         {
-            game.physics.p2.createRevoluteConstraint(newRect, [0, -10], lastRect, [0, 10], maxForce);
+            game.physics.p2.createRevoluteConstraint(newRect, [0, -8], lastRect, [0, 8], maxForce);
         }
 
         lastRect = newRect;
@@ -100,16 +124,16 @@ function createBacon(length, xAnchor, yAnchor){
 }
 
 function createSandwich(){
-	var sarah = game.add.sprite(400, 600, 'sandwich');
+	sandwich = game.add.sprite(500, 600, 'sandwich');
 
-	sarah.width = 200;
-	sarah.height = 120;
+	sandwich.width = 200;
+	sandwich.height = 120;
 
-	game.physics.p2.enable(sarah, false);
+	game.physics.p2.enable(sandwich, false);
 
-	sarah.body.setRectangle(200, 120);
+	sandwich.body.setRectangle(200, 120);
 
-	sarah.body.static = true;
+	sandwich.body.static = true;
 }
 
 function lancer(){
@@ -121,21 +145,23 @@ function lancer(){
 function createPan(){
 	pan = game.add.sprite(110, 600, 'pan');
 
-	pan.width = 260;
-	pan.height = 50;
 
-	game.physics.p2.enable(pan, false);
+	game.physics.p2.enable(pan, true);
 
-	pan.body.setRectangle(260, 50);
+    //pan.body.collideWorldBounds = false;
+    
+    pan.body.angle = 40;
 
-	//pan.body.collideWorldBounds = false;
+    pan.body.static = true;  
+    pan.body.friction = 0.1;
+    pan.body.data.gravityScale= 0;
 
-	pan.angle = 20;
-	pan.body.angle = 20;
+    pan.body.clearShapes();
 
-	pan.body.static = true;
+    pan.body.loadPolygon("pan_hitbox", "pan");
+    
+    
 
-	pan.body.mass = 1000;
 }
 
 function hitPan(){
