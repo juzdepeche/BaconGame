@@ -10,10 +10,12 @@ function preload() {
 }
 
 var baconHead;
+var secondHead;
+var wholeBacon = [];
 var pan;
 var initialized;
 var sandwich;
-
+var destroy = false;
 function create() {
     game.stage.backgroundColor = "#FDD1C6";
 
@@ -28,15 +30,25 @@ function create() {
     initialized = true;
 
     baconHead.body.collides(sandwich, hitSandwich, this);
+
 }
 
+function restart(){
+    destroy=false;
+    //deleteOldBacon();
+    createBacon(4, 50, 50);
+}
+
+function deleteOldBacon(){
+    
+}
 
 game.flipPan = function(){
     pan.body.rotateLeft(160);
   };
   
   
-function hitSandwich(){
+function hitSandwich(body, bodyB, shapeA, shapeB, equation){
     console.log("hit")
 }
 
@@ -62,7 +74,10 @@ function update() {
         pan.goingBack = false;
       }
       console.log(pan.body.angle);
+
+      if(baconHead.y >= game.height-100) restart();
     }
+
 }
 
 function createBacon(length, xAnchor, yAnchor){
@@ -80,45 +95,53 @@ function createBacon(length, xAnchor, yAnchor){
         if (i % 2 === 0)
         {
             //  Add sprite (and switch frame every 2nd time)
-            newRect = game.add.sprite(x, y, 'bacon', 1);
+            wholeBacon[i] = game.add.sprite(x, y, 'bacon', 1);
         }   
         else
         {
-            newRect = game.add.sprite(x, y, 'bacon', 0);
+            wholeBacon[i] = game.add.sprite(x, y, 'bacon', 0);
             lastRect.bringToTop();
         }
 
         //  Enable physicsbody
-        game.physics.p2.enable(newRect, false);
+        game.physics.p2.enable(wholeBacon[i], false);
 
-        newRect.anchor.setTo(0.5, 0.5);
+        wholeBacon[i].body.collideWorldBounds = true;
+
+
+        wholeBacon[i].anchor.setTo(0.5, 0.5);
 
         //  Set custom rectangle
-        newRect.width = width;
-        newRect.height = height;
+        wholeBacon[i].width = width;
+        wholeBacon[i].height = height;
         
-        newRect.body.setRectangle(width, height);
+        wholeBacon[i].body.setRectangle(width, height);
 
-        newRect.body.friction = 0.1;
+        wholeBacon[i].body.friction = 0.1;
         if (i === 0)
         {
-            newRect.body.static = true;
-            baconHead = newRect;
+            wholeBacon[i].body.static = true;
+            baconHead = wholeBacon[i];
         }
         else
-        {  
+        {
+
             //  Anchor the first one created
-            newRect.body.velocity.x = 400;      //  Give it a push :) just for fun
-            newRect.body.mass = 50;     //  Reduce mass for evey rope element
+            wholeBacon[i].body.velocity.x = 400;      //  Give it a push :) just for fun
+            wholeBacon[i].body.mass = 50;     //  Reduce mass for evey rope element
         }
 
         //  After the first rectangle is created we can add the constraint
         if (lastRect)
         {
-            game.physics.p2.createRevoluteConstraint(newRect, [0, -8], lastRect, [0, 8], maxForce);
+            game.physics.p2.createRevoluteConstraint(wholeBacon[i], [0, -10], lastRect, [0, 10], maxForce);
         }
 
-        lastRect = newRect;
+        if(i === 1){
+            secondHead = wholeBacon[i];
+        }
+
+        lastRect = wholeBacon[i];
 
     }
 }
@@ -133,13 +156,22 @@ function createSandwich(){
 
 	sandwich.body.setRectangle(200, 120);
 
-	sandwich.body.static = true;
+    sandwich.body.static = true;
+
+    sandwich.body.friction = 1;
+    
+    sandwich.body.onBeginContact.add(hitSandwich, this);
 }
 
 function lancer(){
-	if (baconHead.body.static) {
-		baconHead.body.static = false;
-	}
+    if(!destroy){
+        if (baconHead.body.static) {
+            baconHead.body.static = false;
+            baconHead.body.mass = 50;
+            game.physics.p2.createRevoluteConstraint(baconHead, [0, -10], secondHead, [0, 10], 1000000);
+            destroy = true;
+        }
+    }
 }
 
 function createPan(){
