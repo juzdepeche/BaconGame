@@ -16,6 +16,7 @@ var pan;
 var initialized;
 var sandwich;
 var destroy = false;
+var isHit = false;
 function create() {
     game.stage.backgroundColor = "#FDD1C6";
 
@@ -49,7 +50,14 @@ game.flipPan = function(){
   
   
 function hitSandwich(body, bodyB, shapeA, shapeB, equation){
-    console.log("hit")
+    console.log("hit");
+    isHit = true;
+
+    setTimeout(function(){
+        if(isHit){
+            console.log("Les poulets sont a nous");
+        }
+    }, 2000);
 }
 
 function update() {
@@ -178,7 +186,7 @@ function createPan(){
 	pan = game.add.sprite(110, 600, 'pan');
 
 
-	game.physics.p2.enable(pan, true);
+	game.physics.p2.enable(pan, false);
 
     //pan.body.collideWorldBounds = false;
     
