@@ -1,0 +1,47 @@
+{
+  "name": "bacon",
+  "version": "0.0.1",
+  "description": " Very basic multiplayer online game example made with Phaser, Node.js and Socket.io ",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha",
+    "start": "node server.js"
+  },
+  "author": "Justin Gagnon-Lavoie",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "bcryptjs": "*",
+    "body-parser": "*",
+    "chai-http": "^4.2.0",
+    "connect-flash": "*",
+    "cookie-parser": "^1.4.1",
+    "express": "*",
+    "express-handlebars": "*",
+    "express-messages": "*",
+    "express-session": "*",
+    "express-validator": "*",
+    "gmail-send": "^1.2.14",
+    "js-alert": "^1.0.4",
+    "matter-js": "0.14.2",
+    "mongodb": "*",
+    "mongoose": "^5.2.15",
+    "mysql": "^2.16.0",
+    "nodemailer": "^4.6.8",
+    "p2": "0.7.1",
+    "passport": "*",
+    "passport-http": "*",
+    "passport-local": "*",
+    "socket.io": ">=1.7.3",
+    "socketio": "^1.0.0",
+    "window-popup": "^1.1.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "jasmine": "^3.2.0",
+    "mocha": "^5.2.0",
+    "request": "^2.88.0"
+  },
+  "directories": {
+    "test": "test"
+  }
+}
